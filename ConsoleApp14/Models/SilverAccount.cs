@@ -4,6 +4,9 @@ namespace Bank
     [Serializable]
     class SilverAccount : Account
     {
+        public SilverAccount()
+        {
+        }
         public override string AccountType { get; } = "silver";
         public SilverAccount(string id, string password)
         {

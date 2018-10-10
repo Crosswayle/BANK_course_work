@@ -14,147 +14,91 @@ namespace Bank
 
 		public Account FabricMethod(AccountType accountType)
 		{
-
-
-			return new CopperAccount();
-		}
+            if (accountType == AccountType.Gold)
+            { return new CopperAccount(); }
+            if (accountType == AccountType.Silver)
+            { return new SilverAccount(); }
+            if (accountType == AccountType.Copper)
+            { return new CopperAccount(); }
+            return null;
+        }
 
 		public AccountType GetAccountType()
 		{
-			bool validType = false;
-            Regex reg = new Regex(@"Gold|Silver|Copper");
-            Console.Write("Enter type-key: ");
-            string type = String.Empty;
-            while (validType != true)
+            Console.WriteLine("Enter type - key: ");
+            string type = Console.ReadLine();
+            while (true)
             {
-                type = Console.ReadLine();
-                if (type == "default" || type == "DEFAULT")
+                if (type == "Gold")
                 {
-                    for (int i = 0; i < 3; i++)
-                    {
-                        Thread.Sleep(300);
-                        Console.Write('.');
-                    }
-                    Thread.Sleep(300);
-                    Console.Clear();
-                    Console.WriteLine("Account was successfully created.");
-                    string def_id = Convert.ToString(rnd.Next(100000, 999999));
-                    string def_pass = Convert.ToString(rnd.Next(100000, 999999999));
-                    return new CopperAccount(def_id, def_pass);
+                    return AccountType.Gold;
                 }
-                if (reg.IsMatch(type))
+                if (type == "Silver")
                 {
-                    validType = true;
+                    return AccountType.Silver;
                 }
-                else
+                if (type == "Copper")
                 {
-                    Console.Write("Wrong key, try again: ");
+                    return AccountType.Copper;
                 }
+                Console.WriteLine("Wrong key, try again:");
             }
-
-			//
-			return AccountType.Copper;
-
-
 		}
 
 		private string GetId()
 		{
-
-			return "111222";
+            Console.Write("Enter account ID: ");
+            return Console.ReadLine();
 		}
+
+        private string GetPassword()
+        {
+            Console.Write("Enter account password: ");
+            return Console.ReadLine();
+        }
 
         public Account CreateAccount()
         {
-            Random rnd = new Random();
+           
 			Account tmpAccount = null;
 			try
 			{
-
 				tmpAccount = FabricMethod(GetAccountType());
 				tmpAccount.ID = GetId();
+                tmpAccount.Password = GetPassword();
 			}
-			catch (CretionException ex)
+			catch (Exception ex)
 			{
+                Console.WriteLine(ex.Message);
 			}
-			catch()
-
-
-
-		 
-
-
-
-
-
-			Console.Clear();
-
-			// ID
-			Console.Write("Enter account ID: ");
-			string id = String.Empty;
-			id = Console.ReadLine();
-
-			Console.Clear();
-
-
-			//PASSWORD
-			bool validPassword = false;
-			Console.Write("Enter account password: ");
-			string password = String.Empty;
-			while (validPassword != true)
-			{
-				password = Console.ReadLine();
-				if (Account.CheckPassword(password))
-				{
-					validPassword = true;
-				}
+            return tmpAccount;
 			}
 
-			AddAccount(type, id, password);
-			Console.Clear();
-
-			return tmpAccount;
-			}
-
-		public void AddAccount(string type, string id, string password)
+		public void AddAccount(Account account)
 		{
-			if (type == "Gold")
-			{
-				for (int i = 0; i < 3; i++)
-				{
-					Thread.Sleep(300);
-					Console.Write('.');
-				}
-				Thread.Sleep(300);
-				Console.Clear();
-				Console.WriteLine("Account was successfully created.");
-				ClientBase.Add(new GoldAccount(id, password));
-			}
-			if (type == "Silver")
-			{
-				for (int i = 0; i < 3; i++)
-				{
-					Thread.Sleep(300);
-					Console.Write('.');
-				}
-				Thread.Sleep(300);
-				Console.Clear();
-				Console.WriteLine("Account was successfully created.");
-				ClientBase.Add(new SilverAccount(id, password));
-			}
-			if (type == "Copper")
-			{
-				for (int i = 0; i < 3; i++)
-				{
-					Thread.Sleep(300);
-					Console.Write('.');
-				}
-				Thread.Sleep(300);
-				Console.Clear();
-				Console.WriteLine("Account was successfully created.");
-				ClientBase.Add(new CopperAccount(id, password));
-			}
-		}
+            bool isSuccsess = true;
+            try
+            {
+                ClientBase.Add(account);
+            }
+            catch (Exception ex)
+            {
+                isSuccsess = false;
+                Console.WriteLine(ex.Message);
+            }
+
+            if (isSuccsess == true)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    Thread.Sleep(300);
+                    Console.Write('.');
+                }
+                Thread.Sleep(300);
+                Console.Clear();
+                Console.WriteLine("Account was successfully created.");
+            }
+        }
         public void SerializeAccount(Account someAccount)
         {
             BinaryFormatter formatter = new BinaryFormatter();
@@ -177,10 +121,11 @@ namespace Bank
         }
 		public void Transfer(Account accFrom, Account accTo, int value)
 		{
-			try
-			{
-				
-			}
+            try
+            {
+
+            }
+            catch { }
 		}
 
 

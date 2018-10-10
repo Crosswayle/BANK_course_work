@@ -46,7 +46,6 @@
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Bank.cs" />
     <Compile Include="Models\CopperAccount.cs" />
-    <Compile Include="Models\CretionException.cs" />
     <Compile Include="Models\GoldAccount.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
