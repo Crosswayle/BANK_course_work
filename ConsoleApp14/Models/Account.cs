@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.IO;
 namespace Bank
 {
 	[Serializable]
@@ -18,8 +19,11 @@ namespace Bank
 				if (value.Length < 6 || value.Length > 6 || regex.IsMatch(value)!=true)
 				{
 					throw new Exception("This ID doesn't match template, choose another one. ");
-
 				}
+                if (File.Exists("User"+value+".txt"))
+                {
+                    throw new Exception("This ID is already created in base, choose another one. ");
+                }
 				_id = value;
 			}
 		}

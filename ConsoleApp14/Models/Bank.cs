@@ -9,8 +9,11 @@ namespace Bank
 {
 	public enum AccountType {Gold, Silver, Copper}
 
+    [Serializable]
     class Bank
     {
+		bool isSigningInPossible = true;
+        public List<string> BaseID = new List<string>();
         public List<Account> ClientBase = new List<Account>();
 		Account _currentAcc;
 		public Account CurrentAccount
@@ -72,7 +75,6 @@ namespace Bank
 
 		public Account CreateAccount()
 		{
-
 			Account tmpAccount = null;
 			bool IsSuccsess = false;
 			while (IsSuccsess == false)
@@ -92,6 +94,7 @@ namespace Bank
 				}
 			}
 			CurrentAccount = tmpAccount;
+            BaseID.Add(tmpAccount.ID);
 			return tmpAccount;
 		}
 
@@ -124,6 +127,29 @@ namespace Bank
                 Console.WriteLine("Account was successfully created.");
             }
         }
+        public void SignIn(string id, string password)
+        {
+            bool isExist = false;
+            Account tmpAccount= null;
+            foreach (var item in ClientBase)
+            {
+                if(item.ID == id)
+                {
+                    isExist = true;
+                    tmpAccount = item;
+                }
+            }
+            if(isExist == false)
+            {
+                throw new Exception("There is no such account.");
+            }
+            else
+            {
+                CurrentAccount = tmpAccount;
+                Console.WriteLine("You have entered to your account succsessfully.");
+            }
+       
+        }
 
         public void SerializeAccount(Account someAccount)
         {
@@ -134,7 +160,15 @@ namespace Bank
                 Console.WriteLine("User id:" + someAccount.ID + " was saved to database.");
             }
         }
-
+        public void SerializeIDBase(List<string> IDbase)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (FileStream file = new FileStream("BaseID", FileMode.OpenOrCreate))
+            {
+                formatter.Serialize(file, IDbase);
+                Console.WriteLine("ID base was serialized");
+            }
+        }
         public Account DeserializeAccount(string id)
         {
             BinaryFormatter formatter = new BinaryFormatter();
@@ -147,7 +181,51 @@ namespace Bank
 
         }
 
-		public void Transfering(Account accFrom)
+        public List<Account> AccountBaseDeserializator()
+        { 
+            List<Account> tmpClientBase = new List<Account>();
+            foreach (var item in BaseID)
+            {
+                tmpClientBase.Add(DeserializeAccount(item));
+            }
+            return tmpClientBase;
+        }
+
+		public bool IsIdBaseEmpty()
+		{
+			if (System.IO.File.Exists("BaseID") == false)
+			{
+				return true;
+			}
+
+			string tmpIDBase;
+
+			using (FileStream file = new FileStream("BaseID", FileMode.OpenOrCreate, FileAccess.Read))
+			{
+				StreamReader formatter = new StreamReader(file);
+				tmpIDBase = formatter.ReadToEnd();
+			}
+	
+			if (tmpIDBase.Replace(" ", "").Length != 0)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		public List<string> IDBaseDeserializator()
+        {
+
+            List<string> tmpIDBase = new List<string>();
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (FileStream file = new FileStream("BaseID", FileMode.OpenOrCreate))
+            {
+                tmpIDBase = (List<string>)formatter.Deserialize(file);
+            }
+            return tmpIDBase;
+        }
+        public void Transfering(Account accFrom)
 		{
 			Console.Write("Enter destination id: ");
 			string ID = Console.ReadLine();
@@ -201,59 +279,107 @@ namespace Bank
 				Console.WriteLine(ex.Message);
 			}
 		}
+		public void ShowAccountInfo(Account account)
+		{
+			account.ShowInfo();
+		}
+		public void AddToDeposit(int value)
+		{
 
-        public void Process()
+		}
+
+        public void MenuIO()
         {
             int choise = new int();
             Console.WriteLine("Choose action:");
+		flag:;
             Console.WriteLine("1. Sign in");
             Console.WriteLine("2. Sign up");
             Console.Write("> ");
-			bool isCorrect = false;
-			while (isCorrect != true)
-			{
-				choise = Convert.ToInt32(Console.ReadLine());
+            bool isCorrect = false;
+            while (isCorrect != true)
+            {
+                choise = Convert.ToInt32(Console.ReadLine());
 				if (choise == 1)
 				{
-					Console.Clear();
-					isCorrect = true;
-				}
-				if (choise == 2)
-				{
-					Console.Clear();
-					ClientBase.Add(CreateAccount());
-					isCorrect = true;
+					if (isSigningInPossible == false)
+					{
+						Console.WriteLine("ID Base is empty, please sign up.");
+						Thread.Sleep(1200);
+						Console.Clear();
+						goto flag;
+					}
+					else
+					{
+						while (isCorrect != true)
+						{
+							Console.Write("Enter your id: ");
+							string _signInId = Console.ReadLine();
+							Console.Write("Enter your password: ");
+							string _signInPass = Console.ReadLine();
+							try
+							{
+								SignIn(_signInId, _signInId);
+								isCorrect = true;
+							}
+							catch (Exception ex)
+							{
+								isCorrect = false;
+								Console.WriteLine(ex.Message);
+							}
+							for (int i = 0; i < 3; i++)
+							{
+								Thread.Sleep(300);
+								Console.Write('.');
+							}
+							Thread.Sleep(300);
+							Console.Clear();
+						}
+					}
 				}
 				else
 				{
-					Console.WriteLine("Wrong choise, try again:");
-					Console.Write("> ");
-				}
-			}
-			for (int i = 0; i < 3; i++)
-			{
-				Thread.Sleep(300);
-				Console.Write('.');
-			}
-			Thread.Sleep(300);
-			Console.Clear();
-			Console.WriteLine("Account was successfully created.");
-			Thread.Sleep(1200);
-			Console.Clear();
+					if (choise == 2)
 
-			bool isWorking = true;
-			while (isWorking == true)
-			{
-				Console.WriteLine("Choose action: ");
-				Console.WriteLine("1. Money transfer.");
-				Console.WriteLine("2. Widthdraw money.");
+					{
+						Console.Clear();
+						ClientBase.Add(CreateAccount());
+						isCorrect = true;
+						for (int i = 0; i < 3; i++)
+						{
+							Thread.Sleep(300);
+							Console.Write('.');
+						}
+						Thread.Sleep(300);
+						Console.Clear();
+						Console.WriteLine("Account was successfully created.");
+					}
+					else
+					{
+						Console.WriteLine("Wrong choise, try again:");
+						Console.Write("> ");
+					}
+				}
+            }
+           
+            Thread.Sleep(1200);
+            Console.Clear();
+
+            
+            while (true)
+            {
+                Console.WriteLine("Choose action: ");
+                Console.WriteLine("1. Money transfer.");
+                Console.WriteLine("2. Widthdraw money.");
 				Console.WriteLine("3. Add money.");
+				Console.WriteLine("4. Show account info.");
+				Console.WriteLine("5. Deposit money.");
 				Console.WriteLine("0. Exit.");
-				Console.Write("> ");
-				choise = Convert.ToInt32(Console.ReadLine());
-				Thread.Sleep(200);
-				Console.Clear();
-				bool isSuccsess = true;
+                Console.Write("> ");
+                choise = Convert.ToInt32(Console.ReadLine());
+                Thread.Sleep(200);
+                Console.Clear();
+                bool isSuccsess = true;
 				if (choise == 1)
 				{
 
@@ -279,11 +405,11 @@ namespace Bank
 					}
 					Thread.Sleep(2000);
 				}
-				if (choise == 0)
+				else if (choise == 0)
 				{
 					break;
 				}
-				if (choise == 3)
+				else if (choise == 3)
 				{
 					Console.Write("Enter count of money: ");
 					int moneyCount = Convert.ToInt32(Console.ReadLine());
@@ -302,30 +428,75 @@ namespace Bank
 
 
 				}
-				if (choise == 2)
+				else if (choise == 2)
 				{
 					Console.Write("Enter count of money: ");
 					int moneyCount = Convert.ToInt32(Console.ReadLine());
-					
+
 					MoneyWithdraw(CurrentAccount, moneyCount);
-					
+
 					for (int i = 0; i < 3; i++)
 					{
 						Thread.Sleep(300);
 						Console.Write('.');
-					}			
+					}
 					Thread.Sleep(2000);
 				}
+				else if (choise == 4)
+				{
+					ShowAccountInfo(CurrentAccount);
+					Console.ReadKey();
+				}
+				else if (choise == 5)
+				{
+					isSuccsess = false;
+					while (isSuccsess == false)
+					{
+						Console.WriteLine("Choose action: ");
+						Console.WriteLine("1. Add money.");
+						Console.WriteLine("2. Widthdraw money.");
+						Console.Write("> ");
+						choise = Convert.ToInt32(Console.ReadLine());
+
+						if(choise == 1)
+						{
+							Console.Write("Enter value: ");
+							int value = Convert.ToInt32(Console.ReadLine());
+
+						}
+					}
+				}
+				else
+				{
+					Console.WriteLine("Invalid value, try again.");
+					Thread.Sleep(1500);
+				}
+
+                Console.Clear();
+            }
 
 
-				Console.Clear();
-			}
-			foreach (var item in ClientBase)
+        }
+
+        public void Process()
+        {
+
+      
+			if (IsIdBaseEmpty() == false)
 			{
-				SerializeAccount(item);
+				BaseID = IDBaseDeserializator();
 			}
-			
+			else { isSigningInPossible = false;}
+			ClientBase = AccountBaseDeserializator();
 
+			Console.WriteLine();
+			MenuIO();
+
+            foreach (var item in ClientBase)
+            {
+                SerializeAccount(item);
+            }
+            SerializeIDBase(BaseID);
         }
     }
 }
