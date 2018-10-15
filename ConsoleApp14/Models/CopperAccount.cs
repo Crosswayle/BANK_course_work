@@ -6,16 +6,11 @@ namespace Bank
     {
 		public CopperAccount()
 		{
+			AccountType = AccountType.Copper;
+			DepositPercentage = 2.2f;
 
 		}
-        public override string AccountType { get; } = "copper";
-        public CopperAccount(string id, string password)
-        {
-            CreditPercentage = 5.5f;
-            DepositPercentage = 2.2f;
-            ID = id;
-            Password = password;
-        }
+       
 
     }
 }

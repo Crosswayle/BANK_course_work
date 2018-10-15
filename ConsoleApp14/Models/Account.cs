@@ -8,7 +8,8 @@ namespace Bank
 	abstract class Account
 	{
 		private int _AccState;
-        private string _id;
+		private string _id;
+		private float _deposite;
         private string _password;
         public string ID
 		{
@@ -29,7 +30,7 @@ namespace Bank
 		}
 		public string Password
 			{
-				get => _id;
+				get => _password;
 				set
 				{
                  if (value.Length < 6 || value.Length > 10)
@@ -40,7 +41,7 @@ namespace Bank
 				}
 			}
 
-		public virtual string AccountType { get; }
+		public AccountType AccountType { get; set; } 
 		public int AccountState
 		{
 			get => _AccState;
@@ -54,19 +55,32 @@ namespace Bank
 			}
 		}
 
-        public float CreditAccount { get; set; }
-        public float DepositAccount { get; set; }
-        public float CreditPercentage { get; set; }
+        public float DepositAccount
+		{
+			get => _deposite; 
+			set
+			{
+				if(value >= 0)
+				{
+					_deposite = value;
+				}
+				else
+				{
+					throw new Exception("Negative DepositState value.");
+				}
+			}
+
+		}
+
         public float DepositPercentage { get; set; }
         public void ShowInfo()
         {
+			
             Console.WriteLine($"> ID: {ID}");
             Console.WriteLine($"> Password: {Password}");
             Console.WriteLine($"> Account type: {AccountType}");
             Console.WriteLine($"> Account status: {AccountState} $");
-            Console.WriteLine($"> Credit account status: {CreditAccount} $");
             Console.WriteLine($"> Deposit account status: {DepositAccount} $");
-            Console.WriteLine($"> Credit percentage: {CreditPercentage} %");
             Console.WriteLine($"> Deposit percentage: {DepositPercentage} %");
         }
       

@@ -6,14 +6,9 @@ namespace Bank
     {
         public SilverAccount()
         {
-        }
-        public override string AccountType { get; } = "silver";
-        public SilverAccount(string id, string password)
-        {
-            CreditPercentage = 3.5f;
-            DepositPercentage = 3.5f;
-            ID = id;
-            Password = password;
-        }
+			AccountType = AccountType.Copper;
+			DepositPercentage = 3.5f;
+		}
+
     }
 }

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 namespace Bank
 {
+	[Serializable]
 	public enum AccountType {Gold, Silver, Copper}
 
     [Serializable]
@@ -22,6 +23,7 @@ namespace Bank
 			set
 			{
 				_currentAcc = value;
+				CurrentAccount.AccountType = value.AccountType;
 
 			}
 
@@ -58,6 +60,7 @@ namespace Bank
                     return AccountType.Copper;
                 }
                 Console.Write("Wrong key, try again:");
+				Thread.Sleep(1000);
             }
 		}
 
@@ -81,20 +84,22 @@ namespace Bank
 			{
 				try
 				{
-					
 					tmpAccount = FabricMethod(GetAccountType());
 					tmpAccount.ID = GetId();
 					tmpAccount.Password = GetPassword();
+
 					IsSuccsess = true;
 				}
 				catch (Exception ex)
 				{
 					IsSuccsess = false;
 					Console.WriteLine(ex.Message);
+					Thread.Sleep(1500);
+					Console.Clear();
 				}
 			}
 			CurrentAccount = tmpAccount;
-            BaseID.Add(tmpAccount.ID);
+			BaseID.Add(tmpAccount.ID);
 			return tmpAccount;
 		}
 
@@ -175,7 +180,6 @@ namespace Bank
             using (FileStream file = new FileStream("User" + id+".txt", FileMode.OpenOrCreate))
             {
                 Account someAcc = (Account)formatter.Deserialize(file);
-                Console.WriteLine("User id:" + id + "was deserialized.");
                 return someAcc;
             }
 
@@ -283,16 +287,12 @@ namespace Bank
 		{
 			account.ShowInfo();
 		}
-		public void AddToDeposit(int value)
-		{
-
-		}
 
         public void MenuIO()
         {
             int choise = new int();
             Console.WriteLine("Choose action:");
-		flag:;
+			flag:;
             Console.WriteLine("1. Sign in");
             Console.WriteLine("2. Sign up");
             Console.Write("> ");
@@ -365,7 +365,7 @@ namespace Bank
             Thread.Sleep(1200);
             Console.Clear();
 
-            
+
             while (true)
             {
                 Console.WriteLine("Choose action: ");
@@ -382,7 +382,7 @@ namespace Bank
                 bool isSuccsess = true;
 				if (choise == 1)
 				{
-
+					isSuccsess = true;
 					try
 					{
 						Transfering(CurrentAccount);
@@ -399,11 +399,7 @@ namespace Bank
 						Console.Write('.');
 					}
 					Console.WriteLine();
-					if (isSuccsess == true)
-					{
-						Console.WriteLine("Transfering was succsessful.");
-					}
-					Thread.Sleep(2000);
+					Thread.Sleep(1000);
 				}
 				else if (choise == 0)
 				{
@@ -449,20 +445,78 @@ namespace Bank
 				}
 				else if (choise == 5)
 				{
-					isSuccsess = false;
-					while (isSuccsess == false)
+					while (true)
 					{
+						isSuccsess = true;
 						Console.WriteLine("Choose action: ");
 						Console.WriteLine("1. Add money.");
 						Console.WriteLine("2. Widthdraw money.");
+						Console.WriteLine("0. Back.");
 						Console.Write("> ");
 						choise = Convert.ToInt32(Console.ReadLine());
 
-						if(choise == 1)
+						if (choise == 1)
 						{
 							Console.Write("Enter value: ");
 							int value = Convert.ToInt32(Console.ReadLine());
+							try
+							{
+								CurrentAccount.DepositAccount += value;
+							}
+							catch (Exception ex)
+							{
+								isSuccsess = false;
+								Console.WriteLine(ex.Message);
+							}
+							for (int i = 0; i < 3; i++)
+							{
+								Thread.Sleep(300);
+								Console.Write('.');
+							}
+							Console.WriteLine();
+							if (isSuccsess == true)
+							{
+								Console.WriteLine("Succsessfully.");
+							}
 
+							Thread.Sleep(1500);
+							Console.Clear();
+						}
+						else if (choise == 2)
+						{
+							Console.Write("Enter value: ");
+							int value = Convert.ToInt32(Console.ReadLine());
+							try
+							{
+								CurrentAccount.DepositAccount -= value;
+							}
+							catch (Exception ex)
+							{
+								isSuccsess = false;
+								Console.WriteLine(ex.Message);
+							}
+							for (int i = 0; i < 3; i++)
+							{
+								Thread.Sleep(300);
+								Console.Write('.');
+							}
+							Console.WriteLine(	);
+							if (isSuccsess == true)
+							{
+								Console.WriteLine("Succsessfully.");
+							}
+							Thread.Sleep(2000);
+							Console.Clear();
+						}
+						else if (choise == 0)
+						{
+							break;
+						}
+						else
+						{
+							Console.Write("Wrong choise, try again");
+							Thread.Sleep(2000);
+							Console.Clear();
 						}
 					}
 				}
@@ -489,7 +543,6 @@ namespace Bank
 			else { isSigningInPossible = false;}
 			ClientBase = AccountBaseDeserializator();
 
-			Console.WriteLine();
 			MenuIO();
 
             foreach (var item in ClientBase)
